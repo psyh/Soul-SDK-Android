@@ -102,7 +102,7 @@ public class SoulError {
 
 ## Пример реализации авторизации
 
-Ниже рассмотрен пример реализации авторизации на примере SoulResponse:
+Ниже рассмотрен пример реализации авторизации через подтверждение мобильного телефона на примере `SoulResponse`:
 
 ```java
 public class AuthActivity extends Activity {
@@ -110,9 +110,7 @@ public class AuthActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-/* при старте приложения автоматически пробуем авторизироваться */
-
+        // при старте приложения автоматически пробуем авторизироваться
         SoulAuth.login(authCallback);
     }
 
@@ -120,20 +118,18 @@ public class AuthActivity extends Activity {
     private SoulCallback authCallback = new SoulCallback<AuthorizationResponse>() {
         @Override
         public void onSuccess(AuthorizationResponse responseEntity) {
-
-/* после каждого успешного SoulSDK автоматически сохраняет все необходимые данные для успешной авторизации в следующий раз, поэтому  никаких параметров в данный метод передавать не требуется  */
-
+            // после каждого успешного SoulSDK автоматически сохраняет все необходимые данные 
+            // для успешной авторизации в следующий раз, поэтому  никаких параметров в данный метод 
+            // передавать не требуется
             startActivity(new Intent(this, NextBeautifulActivity.class));
         }
 
         @Override
         public void onError(SoulError error) {
-
             switch (error.getCode()) {
                 case SoulError.NO_LOGIN_CREDENTIALS:
-
-/* в случае отсутствия необходимых данны для логина в фоне, показываем экран с просьбой ввести номер телефона для авторизации  */
-
+                    // в случае отсутствия необходимых данны для логина в фоне, показываем экран 
+                    // с просьбой ввести номер телефона для авторизации
                     showPhoneInput();
                     break;
                 case SoulError.PHONE_WRONG_CODE:
@@ -145,25 +141,20 @@ public class AuthActivity extends Activity {
         }
     };
 
+    // после того, как пользователь ввел номер телефона отправляем запрос SMS на этот 
+    // номер мобильного телефона ...
     public void requestPhoneNumber(String phoneNumber) {
-
-/* после того, как пользователь ввел номер телефона отправляем запрос SMS на это номер мобильного телефона ... */
-
         SoulAuth.requestPhone(phoneNumber);
-
-/* … и отображаем форму для ввода проверочного кода */
-
+        //... и отображаем форму для ввода проверочного кода
         showVerificationCodeInput();
     }
 
     public void verifyPhone(String verificationCode) {
-
-/* после того, как пользователь ввел номер телефона отправляем запрос SMS на это номер мобильного телефона  */
-
-        SoulAuth.verifyPhone(authCallback);
+        // после того, как пользователь получил проверочный код на указанный ранее номер телефона, 
+        // отправляем код на валидацию
+        SoulAuth.verifyPhone(verificationCode, authCallback);
     }
-}
-```
+}```
 
 
 
