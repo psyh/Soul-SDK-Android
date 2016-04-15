@@ -28,9 +28,9 @@ Soul предоставляет вам возможность создавать
         SoulConfigs.setLikeReactionLifeTime(SoulConfigs.ONE_MONTH);
         SoulConfigs.setDislikeReactionLifeTime(SoulConfigs.ONE_YEAR);
         SoulConfigs.setUserAgentAppVersion(BuildConfig.VERSION_NAME);
-        SoulConfigs.setUserAgentAppName("Pure");
-        SoulConfigs.setChatsCredentials(ApplicationConfig.PUBLISH_KEY,
-                                        ApplicationConfig.SUBSCRIBE_KEY);
+       
+        // other
+        
 ```
 
 ## Список возможностей
@@ -58,7 +58,7 @@ Soul предоставляет вам возможность создавать
 * `SoulSystem` - набор методов для получения информации о настройках, параметрах связанных с сервером Soul. Например: getServerTime()
 
 
-## Возвращаемые значения
+### Возвращаемые значения
 
 Любой метод из перечисенных выше классов вызывается в качестве статического метода этого класса и не требует никаких дополнительных зависимостей. 
 Например:  SoulReactions.likeUser(userId) 
@@ -103,7 +103,9 @@ public class SoulError {
 }
 ```
 
-## Пример реализации авторизации
+
+
+## Пример авторизации
 
 Ниже рассмотрен пример реализации авторизации через подтверждение мобильного телефона на примере `SoulResponse`:
 
@@ -161,4 +163,11 @@ public class AuthActivity extends Activity {
 ```
 
 
+## Пример работы с авторизированным пользователем
 
+Авторизированного пользователя всегда можно получать жанным методом здесь находится актуальная информация, т.к. объект всегда синхронизируется с сервером после каждой успешной авторизации.
+        
+```java
+        User authorizedUser = SoulCurrentUser.getCurrentUser();
+        Log.e(TAG, "Usersid is " + authorizedUser.getId());
+```
