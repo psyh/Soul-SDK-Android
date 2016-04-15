@@ -149,12 +149,13 @@ public class AuthActivity extends Activity {
         showVerificationCodeInput();
     }
 
+    // после того, как пользователь получил проверочный код на указанный ранее номер телефона, 
+    // отправляем код на валидацию
     public void verifyPhone(String verificationCode) {
-        // после того, как пользователь получил проверочный код на указанный ранее номер телефона, 
-        // отправляем код на валидацию
         SoulAuth.verifyPhone(verificationCode, authCallback);
     }
-}```
+}
+```
 
 
 
