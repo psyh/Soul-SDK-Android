@@ -23,11 +23,14 @@ Soul предоставляет вам возможность создавать
 После того, как вы инициализировали SoulSDK, вы можете вызвать методы установки параметро. Это дейсвие не является обязательным, если его проигнорировать все параметры получат значения по умолчанию.
 
 ```java
+        SoulConfigs.setGCMSenderId(ApplicationConfig.SENDER_ID);
         SoulConfigs.setSearchLifeTimeValue(SoulConfigs.ONE_HOUR);
         SoulConfigs.setLikeReactionLifeTime(SoulConfigs.ONE_MONTH);
         SoulConfigs.setDislikeReactionLifeTime(SoulConfigs.ONE_YEAR);
         SoulConfigs.setUserAgentAppVersion(BuildConfig.VERSION_NAME);
         SoulConfigs.setUserAgentAppName("Pure");
+        SoulConfigs.setChatsCredentials(ApplicationConfig.PUBLISH_KEY,
+                                        ApplicationConfig.SUBSCRIBE_KEY);
 ```
 
 ## Список возможностей
