@@ -5,14 +5,13 @@ SoulSDK предоставляет удобно серверное решени�
 Инициализация
 
  Добавте следующие строки в классе Application в метод onCreate():
-
-
-`   @Override
-   public void onCreate() {
-       super.onCreate();
-       SoulSDK.initialize("API_KEY", this);
-   }`
-
+```java
+ @Override
+    public void onCreate() {
+        super.onCreate();
+        SoulSDK.initialize("API_KEY", this);
+    }
+```
 Вместо “API_KEY” вставте ключ, соответствующий вашему аккаунту в Soul.
 
 
