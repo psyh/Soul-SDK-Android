@@ -60,14 +60,15 @@ Soul предоставляет вам возможность создавать
 Любой метод из перечисенных выше классов вызывается в качестве статического метода этого класса и не требует никаких дополнительных зависимостей. 
 Например:  SoulReactions.likeUser(userId) 
 
-Все методы `SoulSDK` предоставляют возможность получения результатов в двух вариантах: через универсальный интерфейс SoulCallback, а также для поклонников реактивности через универсальный `Observable<SoulResponse<UserRESP>>`.
+Все методы `SoulSDK` предоставляют возможность получения результатов в двух вариантах: 
+
+⋅⋅⋅через универсальный интерфейс `SoulCallback`
 
 ```java
- @Override
-    public void onCreate() {
-        super.onCreate();
-        SoulSDK.initialize("API_KEY", this);
-    }
+public interface SoulCallback<T> {
+    void onSuccess(T responseEntity);
+    void onError(SoulError error);
+}
 ```
 
 ```java
@@ -86,6 +87,16 @@ public class SoulError {
           private int code = 0;
 
       // ...
+}
+```
+
+⋅⋅⋅для поклонников реактивности через универсальный `Observable<SoulResponse<T>>`
+
+```java
+ SoulUsers.getNextSearchResult()
+                .subscribe(
+                        res -> sowUsers(res.getResponse().getUsers()),
+                        err -> Log.e(TAG, "error " + err.getMessage()));
 }
 ```
 
