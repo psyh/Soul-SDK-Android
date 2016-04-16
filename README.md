@@ -302,21 +302,19 @@ public class User {
 В Soulplatform существует такое понятие как __`availability`__ - это способность находить других пользователей и быть видимым для поиска другими пользователями. Соответствует свойству {"filterable":{"availableTill": [unix time here]}},
 где `availableTill` - это временная метка, время до которого пользователь обладает данной способностью.
 
-
-
 * __`SoulCurrentUser.getTimeLeft()`__ - возвращает время оставшееся до конца __availability__
 
 * __`SoulCurrentUser.turnSearchOn()`__ - устанавливает значение __availableTill__ равным сумме текущего времени сервера и длительности __availability__. Значение длительности заданно по умолчанию в SoulSDK, однако ее всегда можно сменить вызовом метода  `SoulConfigs.setSearchLifeTimeValue(long val)`
 
+* __`SoulCurrentUser.turnSearchOff()`__ - сбрасывает значение __availableTill__ и пользователь теряет способность __availability__
 
+* __`SoulCurrentUser.updateGCMToken(String token)`__ - самый простой и быстрый способ сообщить серверу о токене для получения push уведомлений. Альтернативой может быть создание объекта `UsersParameters` самостоятельно и передачей собранного json на сервер.
 
+* __`SoulCurrentUser.updateSelfGender(String gender)`__ - самый простой и быстрый способ передать на сервер пол авторизированного пользователя
 
+* __`SoulCurrentUser.updateTargetGender(String gender)`__ - самый простой и быстрый способ передать на сервер пол пользователей, которые будут найдены в процессе поиска
 
-
-
-
-
-
+* __`SoulCurrentUser.updateLocation(Location location)`__ - нет проще способа сообщить серверу о своем местоположении
 
 
 
