@@ -299,14 +299,14 @@ public class User {
 
 На данный момент реализованные следующие "быстрые" методы для работы с такими свойствами:
 
-В Soulplatform существует такое понятие как `__availability__` - это способность находить других пользователей и быть видимым для поиска другими пользователями. Соответствует свойству {"filterable":{"availableTill": [unix time here]}},
+В Soulplatform существует такое понятие как __`availability`__ - это способность находить других пользователей и быть видимым для поиска другими пользователями. Соответствует свойству {"filterable":{"availableTill": [unix time here]}},
 где `availableTill` - это временная метка, время до которого пользователь обладает данной способностью.
 
 
 
-* `__SoulCurrentUser.getTimeLeft()__` - возвращает время оставшееся до конца __availability__
+* __`SoulCurrentUser.getTimeLeft()`__ - возвращает время оставшееся до конца __availability__
 
-* `__SoulCurrentUser.turnSearchOn()__` - устанавливает значение __availableTill__ равным сумме текущего времени сервера и длительности __availability__. Значение длительности заданно по умолчанию в SoulSDK, однако ее всегда можно сменить вызовом метода  `SoulConfigs.setSearchLifeTimeValue(long val)`
+* __`SoulCurrentUser.turnSearchOn()`__ - устанавливает значение __availableTill__ равным сумме текущего времени сервера и длительности __availability__. Значение длительности заданно по умолчанию в SoulSDK, однако ее всегда можно сменить вызовом метода  `SoulConfigs.setSearchLifeTimeValue(long val)`
 
 
 
