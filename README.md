@@ -316,5 +316,39 @@ public class User {
 
 * __`SoulCurrentUser.updateLocation(Location location)`__ - нет проще способа сообщить серверу о своем местоположении
 
+Актуальное текущее время сервера всегда можно получить при помощи метода __`SoulSystem.getServerTime()`__
 
 
+## Работа с изображениями
+
+SoulPlatform дает возможность загружать, читать и удалять изображения. Любые изображения на сервере хранятся в __альбомах__, следовательно существует возможность добавлять, удалять и изменять альбомы. 
+Для каждого пользователя существует как минимум один предустановленный альбом с именем __"default"__
+
+### Пример получения фотографий из альбома
+
+```java
+    SoulMedia.getPhotosFromMyAlbum("default", 0, 10, new SoulCallback<AlbumRESP>() {
+        @Override
+        public void onSuccess(AlbumRESP responseEntity) {
+            List<Photo> photoList =  responseEntity.getAlbum().getPhotos();
+            String avatarPhoto =  responseEntity.getAlbum().getMainPhoto().getOriginal().getUrl();
+        }
+
+        @Override
+        public void onError(SoulError error) {
+            Log.e(TAG, "Error: " + error.getDescription());
+        }
+    });
+```
+
+Следующим способом можно удалить свою фотографию (необъодимо знать альбом в котором она находится):
+```java
+    List<Photo> photoList =  responseEntity.getAlbum().getPhotos();
+    String photoId = photoList.get(1).getId();
+    SoulMedia.deleteMyPhoto("default", photoId, new SoulCallback<Boolean>() {...});
+```
+
+Чтобы добавить фотографию в альбом:
+```java
+    SoulMedia.addPhotoToMyAlbum("default", photoFile, new SoulCallback<PhotoRESP>() {...});
+```
