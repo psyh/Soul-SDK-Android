@@ -76,20 +76,20 @@ public interface SoulCallback<T> {
 
 ```java
 public class SoulResponse<T> {
-          private SoulError error;
-          private boolean hasError = false;
-          private T response;
-
-      // ...
+      private SoulError error;
+      private boolean hasError = false;
+      private T response;
+    
+    // ...
 }
 ```
 
 ```java
 public class SoulError {
-          private String description = "";
-          private int code = 0;
+      private String description = "";
+      private int code = 0;
 
-      // ...
+  // ...
 }
 ```
 
@@ -97,9 +97,9 @@ public class SoulError {
 
 ```java
  SoulUsers.getNextSearchResult()
-                .subscribe(
-                        res -> sowUsers(res.getResponse().getUsers()),
-                        err -> Log.e(TAG, "error " + err.getMessage()));
+        .subscribe(
+                res -> sowUsers(res.getResponse().getUsers()),
+                err -> Log.e(TAG, "error " + err.getMessage()));
 }
 ```
 
@@ -389,3 +389,180 @@ SoulPlatform дает возможность загружать, читать и
 ```java
     SoulUsers.refreshSearchResult();
 ```
+
+### Взаимодействие с пользователями (Реакции)
+
+Получив в результате поиска других пользователей вы можете отправить кому-либо из них произвольную "реакцию".
+В Soulplatform cуществуют "группы реакций" и сами "реакции". 
+
+Пример структуры: 
+группы: `"liking"`, `"blocking"`
+реакции:
+ __"liking":__ "liked", "disliked"
+ __"blocking":__ "blocked", ...
+ 
+Сами отправляемые на сервер реакции представленны следующей структурой:
+```java
+public class ReactionREQ extends GeneralRequest {
+    private String value;
+    private long expiresTimeInSec;
+    
+    // ...
+}
+```
+Обратите внимание на то, что у каждой реакции есть время жизни, по истечении которой, реакцию можно считать невалидной.
+
+Пример отправки реакции "liked" в группу "liking" со временем жизни заявки в один год:
+```java
+    long reactionLifetime = 365 * 24 * 60 * 60; // 1 год
+    ReactionREQ reaction = new ReactionREQ();
+    reaction.setValue("liked");
+    reaction.setExpiresTimeInSec(SoulSystem.getServerTime() / 1000 + reactionLifetime);
+    SoulReactions.sendReactionToUser(likedUserId, "liking", reaction).subscribe();
+```
+
+Стоит отметить то, что отправленные разные реакции в одну и ту же группу, затирают друг друга, т.е. останется только последняя отправленная.
+
+Таким образом отправив "like" какому-либо пользователю в группу "liking", вы можете снова отправить в эту грппу "dislike", и именно "dislike" будет считаться актуально реакцией на данного пользователя в данной группе реакций. 
+
+Однако, если вы хотите просто удалить какую-либо реакцию, а не презаписать на другую, то для этого можно использовать метод:
+```java
+    SoulReactions.deleteReactionFromUser(likedUserId, "liking").subscribe();
+```
+
+### Популярные свойста пользователя
+Как и в других разделах SoulSDK в `SoulReactions` также есть предустановленные реакции -
+группы и значения, которые используются в большинстве дейтинг приложений.
+
+* __`SoulReactions.likeUser(String userId)`__ - отправляет реакцию `"liked"` 
+в группу `"liking"` со временем жизни установленным по умолчанию в SoulSDk, и который можно легко 
+сменить при помощи метода `setLikeReactionLifeTime(long val)`
+
+* __`SoulReactions.dislikeUser(String userId)`__ - отправляет реакцию `"disliked"` 
+в группу `"liking"` со временем жизни установленным по умолчанию в SoulSDk, и который можно легко 
+сменить при помощи метода `setDislikeReactionLifeTime(long val)`
+
+* __`SoulReactions.blockUser(String userId)`__ - отправляет реакцию `"blocked"` 
+в группу `"blocking"` со временем жизни установленным по умолчанию в SoulSDk, и который можно легко 
+сменить при помощи метода `getBlockReactionLifeTime(long val)`
+
+
+## Чаты
+
+SoulSDK позволяет пользователям создавать чаты друг с другом. В дефолтном варианте 
+чаты между пользователями возможны при условии, что оба пользователя имеют "метч" оба имеют реакции
+"liked" друг на друга. Однако, это можно регулировать в админ-панеле Soulplatform.
+
+Для того, чтобы чаты работали в SoulSDK должны быть переданы ключи: `PUBLISH_KEY` и `SUBSCRIBE_KEY`
+
+```java
+    SoulConfigs.setChatsCredentials(PUBLISH_KEY, SUBSCRIBE_KEY);
+```
+
+Получить все имеющиеся чаты можно следующим способом:
+```java
+    SoulCommunication.getAll(0, 100, false, new SoulCallback<ChatsRESP>() {
+        @Override
+        public void onSuccess(ChatsRESP responseEntity) {
+            List<Chat> chatList = responseEntity.getChats();
+        }
+
+        @Override
+        public void onError(SoulError error) {
+
+        }
+    });
+```
+
+Также можно получить детали одного чата, если известно его `chatId`:
+```java
+    SoulCommunication.getOne(chatId, new SoulCallback<ChatRESP>() {
+        @Override
+        public void onSuccess(ChatRESP responseEntity) {
+            Chat chat = responseEntity.getChat();
+            String channelName = chat.getChannelName(); // получение уникального названия канала
+        }
+
+        @Override
+        public void onError(SoulError error) {
+
+        }
+    });
+```
+Или удалить чат:
+```java
+    SoulCommunication.delete(chatId).subscribe();
+```
+
+Для того, чтобы начать отправлять и получать сообщения необъодимо "присоединится" к чату:
+```java
+    SoulCommunication.connectToChat(chat, new SoulCallback<ChatMessage>() {
+        @Override
+        public void onSuccess(ChatMessage responseEntity) {
+            showMessageInUIChatRoom(responseEntity); //сообщения один за одним приходят сюда
+        }
+
+        @Override
+        public void onError(SoulError error) {
+
+        }
+    })
+```
+
+Как только вы подсоединились к чату, SoulSDK пришлет вам все сообщения, которые были вам присланы,
+но вы их по какой-либо причине не получили. Таким образом произойдет синхронизация с историей сообщений.
+Следующие поступающие входящие сообщения будут приходить в этот же колбек.
+
+Для того, чтобы отправить сообщение, в зависимости от того, что вы хотите отправить,
+необходимо просто вызвать один из следующих методов класса `SoulCommunication`:
+
+* __`sendChatMessage(String channelName, String message)`__ - отправка обычного текстового сообщения
+
+* __`sendChatPhoto(String channelName, File file)`__ - отправка изображения
+
+* __`sendChatLocation(String channelName, Location location)`__ - отправка указанного местоположения
+
+* __`sendChatCurrentLocation(String channelName)`__ - само определит теукщее местоположение и отправит
+
+Для того, чтобы сообщения приходили также в виде push уведомлений (на случай, когда соединение с
+чатом закрыто - например, закрыто приложение) следует передать SENDER_ID в
+
+```java
+    SoulConfigs.setGCMSenderId(ApplicationConfig.SENDER_ID);
+```
+
+## История событий
+
+Пользователи в Soulplatform постоянно появляются, удаляются, взяимодействуют друг с другом, меняют свои статусы или другие свойства,
+добавляются в чаты и удаляются. О большиенстве из этих событий ваш авторизированный пользователь может получать уведомления в виде push нотификаций.
+
+Однако, такие нотификации иногда могут быть не настроены, push-нотификации могут опаздывать или вовсе не приходить.
+Пользователь мог отключить свой девайс на время и в течение него не получать никаких уведомлений.
+
+За это время с интересующими его пользователями произошло множество изменений,
+а также могуть быть открыты чаты с вами или полученные от других пользователей важные реакции на вас.
+
+Все исторические события, что вы пропустили за время отсутствия можно получить при помощи "синхронизации событий":
+```java
+    SoulEvents.get(Long sinceDate, Integer after, Integer limit, new SoulCallback<EventsRESP>() {...});
+```
+При вызове метода следует указать или время, начиная с которого вы хотели бы получить "события" либо последний присланный вам recordId "события".
+Соответственно ван нужно хранить дату последней синхронизации или recordId последнего известного вам сообщения.
+
+Однако, вам ничего из этого не нужно делать, т.к. SoulSDK делает все это за вас. 
+Просто вызовите метод:
+
+```java
+    SoulEvents.get(new SoulCallback<EventsRESP>() {...});
+```
+В колбек вам прийдет результат соответствующий запросу:
+after - сохраненный в SoulSDK recordId последнего известного события.
+limit - значение заданно в SoulSDK по-умолчанию, которое можно сменить используя метод: 
+```java
+    SoulConfigs.setEventsLimit(...);
+```
+
+
+
+
+
