@@ -430,7 +430,7 @@ public class ReactionREQ extends GeneralRequest {
     SoulReactions.deleteReactionFromUser(likedUserId, "liking").subscribe();
 ```
 
-### Популярные свойста пользователя
+### Популярные реакции
 Как и в других разделах SoulSDK в `SoulReactions` также есть предустановленные реакции -
 группы и значения, которые используются в большинстве дейтинг приложений.
 
